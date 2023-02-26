@@ -1,6 +1,7 @@
 const express=require('express');
 const dotenv=require('dotenv');
 const cors=require('cors');
+const userRoute=require('./routes/userRoute');
 const connectToMongoDB=require('./db');
 
 const app=express();
@@ -10,9 +11,7 @@ connectToMongoDB();
 app.use(cors());
 app.options('*',cors());
 
-app.get('/',(req,res)=>{
-    res.send('Server Running')
-})
+app.use('/auth',userRoute);
 
 
 const PORT=process.env.PORT;

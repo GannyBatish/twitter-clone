@@ -22,6 +22,10 @@ const userSchema=new Schema({
         type:String,
         required:true,
     },
+    dob:{
+        type:Date,
+        required:true,
+    },
     isAdmin:{
         type:Boolean,
         default:false,
