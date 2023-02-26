@@ -1,9 +1,11 @@
 const express=require('express');
 const dotenv=require('dotenv');
 const cors=require('cors');
-const app=express();
+const connectToMongoDB=require('./db');
 
+const app=express();
 dotenv.config();
+connectToMongoDB();
 
 app.use(cors());
 app.options('*',cors());
