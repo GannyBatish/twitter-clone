@@ -1,8 +1,7 @@
-const notFound=(req,res,next)=>{
+const notFound=(req,res)=>{
     res.status(404).json({
-        message:`Error : Not Found ${req.originalUrl}`
+        message:`Error : Not Found ${req.method} -> ${req.originalUrl}`
     })
-    next(error);
 }
 
 const errorHandler=(err,req,res,next)=>{
