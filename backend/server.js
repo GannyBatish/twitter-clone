@@ -6,6 +6,7 @@ const connectToMongoDB=require('./db');
 const { notFound, errorHandler } = require('./midlleware/errorMiddleware');
 
 const app=express();
+app.use(express.json());
 dotenv.config();
 connectToMongoDB();
 
