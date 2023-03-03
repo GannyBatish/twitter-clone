@@ -6,6 +6,6 @@ const router=express.Router();
 router.post('/signup',signup);
 router.post('/login',login);
 router.get('/hello',protect,(req,res)=>{
-    res.send(req.user.name);
+    res.send(req.user);
 })
 module.exports=router;

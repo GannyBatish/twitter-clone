@@ -57,20 +57,13 @@ const signup=asyncHandler(async(req,res)=>{
         }
     }
     const user=await User.create({name,username,email,password,dob:new Date(dob),phone});
-    var result={
-        username:user.username,
-        name:user.name,
-        dob:user.dob,
-    }
-    if(user.email){
-        result.email=user.email
-    }
-    if(user.phone){
-        result.phone=phone
-    }
+    const id=user._id;
+        user=user._doc;
+        //deleting unneccesary object properties
+        delete user._id;delete user.password;delete user.createdAt;delete user.updatedAt;delete user.__v;delete user.isAdmin;
     res.status(201).json({
-        ...result,
-        token:await genToken(user._id),
+        ...user,
+        token:await genToken(id),
     });
 })
 
@@ -84,7 +77,7 @@ const loginSchema=joi.object({
 }).or("username","email","phone");
 const login=asyncHandler(async(req,res)=>{
     const {email,phone,username,password}=req.body;
-    const {error}=await loginSchema.validate({email,phone,username,password});
+    var {error}=await loginSchema.validate({email,phone,username,password});
     if(error){
         res.status(400);
         error=error.details[0].message.replace( /\"/g, "" );
