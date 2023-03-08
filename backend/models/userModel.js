@@ -31,6 +31,10 @@ const userSchema=new Schema({
         type:Boolean,
         default:false,
     },
+    pic:{
+        type:String,
+        default:'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png',
+    }
 },{
     timestamps:true,
 })

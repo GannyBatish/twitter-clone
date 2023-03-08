@@ -56,7 +56,7 @@ const signup=asyncHandler(async(req,res)=>{
             throw new Error('Another account is using the same Phone number');
         }
     }
-    const user=await User.create({name,username,email,password,dob:new Date(dob),phone});
+    var user=await User.create({name,username,email,password,dob:new Date(dob),phone});
     const id=user._id;
         user=user._doc;
         //deleting unneccesary object properties
