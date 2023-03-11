@@ -10,7 +10,7 @@ const postTweet=asyncHandler(async(req,res)=>{
         pic=result.url;
     }
     var t=await Tweet.create({author:req.user._id,tweet,pic});
-    t=await t.populate({
+    t=await Tweet.findById(t._id).populate({
         path:'author',
         select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
     })
@@ -47,8 +47,16 @@ const reply=asyncHandler(async(req,res)=>{
         populate: {
             path: 'author',
             select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
+        },
+        populate:{
+            path:'likes',
+            select:'user createdAt',
+            populate:{
+                path:'user',
+                select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
+            }
         }
-    })
+    });
     res.status(201).json(reply);
 })
 const retweet=asyncHandler(async(req,res)=>{
@@ -82,12 +90,14 @@ const retweet=asyncHandler(async(req,res)=>{
         populate: {
             path: 'author',
             select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
-        }
-    }).populate({
-        path:'likes',
+        },
         populate:{
-            path:'user',
-            select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
+            path:'likes',
+            select:'user createdAt',
+            populate:{
+                path:'user',
+                select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
+            }
         }
     })
 
@@ -120,6 +130,7 @@ const likeTweet=asyncHandler(async(req,res)=>{
         },
         populate:{
             path:'likes',
+            select:'user createdAt',
             populate:{
                 path:'user',
                 select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
@@ -127,6 +138,7 @@ const likeTweet=asyncHandler(async(req,res)=>{
         }
     }).populate({
         path:'likes',
+        select:'user createdAt',
         populate:{
             path:'user',
             select:'-password -createdAt -updatedAt -isAdmin -_id -__v -email -dob'
@@ -134,4 +146,36 @@ const likeTweet=asyncHandler(async(req,res)=>{
     })
     res.status(201).json(result);
 })
-module.exports={postTweet,reply,retweet,likeTweet};
+const removeLikeTweet=asyncHandler(async(req,res)=>{
+    const {id}=req.params;
+    const tweet=await Tweet.findById(id);
+    if(!tweet)
+    {
+        res.status(404);
+        throw new Error('No Tweet Found with given ID');
+    }
+    const like=await Like.findOne({user:req.user._id,tweet:tweet._id});
+    if(!like){
+        res.status(401);
+        throw new Error("You Never Liked this Tweet before");
+    }
+    await like.remove();
+    tweet.likes.pull(like._id);
+    await tweet.save();
+    res.status(201).json({message:'Successfully removed Like'});
+})
+const deleteTweet=asyncHandler(async(req,res)=>{
+    const {id}=req.params;
+    const tweet=await Tweet.findById(id);
+    if(!tweet){
+        res.status(404);
+        throw new Error('No Tweet Found with given ID');
+    }
+    if(tweet.author.toString()===req.user._id.toString() || req.user.isAdmin){
+        await tweet.remove();
+        return res.status(202).json({message:'Successfully deleted Tweet'});
+    }
+    res.status(401);
+    throw new Error('You are not authorized to delete this Tweet');
+})
+module.exports={postTweet,reply,retweet,likeTweet,removeLikeTweet,deleteTweet};
