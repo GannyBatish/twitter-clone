@@ -1,4 +1,5 @@
 const cloudinary = require('cloudinary').v2;
+const fs=require('fs');
 
 
 // Configuration 
@@ -9,12 +10,24 @@ cloudinary.config({
 });
 
 const upload=async function(file){
-    const result=await cloudinary.uploader.upload(file,{
+    return cloudinary.uploader.upload(file,{
         public_id:`${Date.now()}`,
         resource_type:"auto",
-        folder:"twitter"
+        folder:"twitter",
+    }).then((result)=>{
+
+      fs.unlinkSync(file);
+      return {
+        message:'success',
+        url:result.url
+      };
+      
+    }).catch((error)=>{
+      fs.unlink(file);
+      return {
+        message:'fail'
+      }
     })
-    return result;
 }
 
 module.exports={upload};
