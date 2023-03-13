@@ -267,7 +267,7 @@ const getTweet=asyncHandler(async(req,res)=>{
 })
 const getAllRepliesofTweet=asyncHandler(async(req,res)=>{
     const page = req.query.page || 1;
-    const perPage = 25;
+    const perPage = 20;
     const {id}=req.params;
     const tweet=await Tweet.findById(id).populate({
         path:'replies',
@@ -382,7 +382,7 @@ const tweetRetweetedBy=asyncHandler(async(req,res)=>{
 
 const quotedRetweetedBy=asyncHandler(async(req,res)=>{
     const page = req.query.page || 1;
-    const perPage = 25;
+    const perPage = 10;
     const {id}=req.params;
     const tweet=await Tweet.findById(id).populate({
         path:'retweets',
